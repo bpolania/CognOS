@@ -1,0 +1,30 @@
+# Core dependencies
+numpy>=1.21.0
+requests>=2.25.0
+pyyaml>=6.0
+
+# AI/ML
+llama-cpp-python>=0.2.0
+transformers>=4.30.0
+torch>=2.0.0
+
+# UI (for desktop overlay)
+PyQt5>=5.15.0
+# Alternative: PyGObject>=3.42.0  # For GTK
+
+# Development
+pytest>=7.0.0
+pytest-cov>=4.0.0
+black>=22.0.0
+flake8>=6.0.0
+
+# System integration
+psutil>=5.9.0
+python-daemon>=3.0.0
+
+# Configuration
+toml>=0.10.0
+configparser>=5.3.0
+
+# Logging
+structlog>=22.0.0
