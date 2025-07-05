@@ -146,4 +146,8 @@ make test           # Run tests
 4. **UI Integration**: Seamless desktop overlay experience
 5. **Multi-user**: Support for multiple users with separate configurations
 
+### Development Guidelines
+
+**Important**: Do not use `🤖 Generated with [Claude Code](https://claude.ai/code)` or similar AI-generated signatures in any commits, PRs, or documentation. Keep all development artifacts clean and professional.
+
 This changelog should provide Claude Code with complete context for continuing development in future sessions.
