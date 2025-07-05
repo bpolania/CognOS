@@ -148,6 +148,8 @@ make test           # Run tests
 
 ### Development Guidelines
 
-**Important**: Do not use `🤖 Generated with [Claude Code](https://claude.ai/code)` or similar AI-generated signatures in any commits, PRs, or documentation. Keep all development artifacts clean and professional.
+**Important**: 
+- Do not use `🤖 Generated with [Claude Code](https://claude.ai/code)` or similar AI-generated signatures in any commits, PRs, or documentation. Keep all development artifacts clean and professional.
+- Every time code changes are made (excluding documentation-only changes), add the changes to this changelog with details about what was modified and why.
 
 This changelog should provide Claude Code with complete context for continuing development in future sessions.
