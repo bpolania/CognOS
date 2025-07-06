@@ -62,6 +62,10 @@ config/secrets.json
 .env
 .env.local
 
+# SSH keys
+rpi
+rpi.pub
+
 # Build artifacts
 src/shell/cognos-shell
 src/ui/cognos-ui
