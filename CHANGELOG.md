@@ -404,4 +404,40 @@ This optimization enables Phase 1 AI engine functionality on Raspberry Pi hardwa
 
 This model change enables reliable Phase 1 AI engine testing and development on Raspberry Pi 5 hardware while maintaining core functionality for command processing and tool integration validation.
 
+### Agent Prompt Engineering and Tool Integration Fixes
+
+#### Issue Identification
+- **Problem**: Agent provided generic responses instead of executing actual commands
+- **Example**: "show me files in this directory" returned "List of files in the directory" without calling tools
+- **Root Cause**: System prompt lacked specific guidance for tool usage and command mapping
+
+#### System Prompt Improvements (src/agent/main.py)
+- **Enhanced Specificity**: Added explicit command-to-tool mappings
+- **Tool Usage Enforcement**: Emphasized ALWAYS use tools instead of descriptions
+- **Common Patterns**: Documented frequent command patterns and their tool equivalents
+- **Response Format**: Clarified required JSON structure with tool_calls
+
+#### Command Mapping Specifications
+```
+- "show files" / "list files" / "what's here" → run_command with "ls -la"
+- "find directory X" → search_folder with pattern X  
+- "go to directory" → run_command with "cd path"
+- "create environment" → create_env
+- "switch environment" → switch_env
+```
+
+#### Prompt Engineering Strategy
+- **Action-Oriented**: Changed from descriptive to action-focused instructions
+- **Tool Priority**: Emphasized tool usage over text-only responses
+- **Example-Driven**: Provided specific examples of correct tool calls
+- **Format Enforcement**: Required consistent JSON structure with tool_calls array
+
+#### Expected Behavior Changes
+- **Before**: "List of files in the directory" (descriptive response)
+- **After**: Uses run_command tool with "ls -la" and executes actual command
+- **Tool Integration**: Consistent use of tool registry for all operations
+- **User Experience**: Actual command execution instead of generic descriptions
+
+This fix addresses the core Phase 1 requirement of functional tool integration and enables proper natural language to system command translation through the AI agent.
+
 This changelog should provide Claude Code with complete context for continuing development in future sessions.
