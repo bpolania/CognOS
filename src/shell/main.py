@@ -106,59 +106,64 @@ class CognosShell:
     
     def get_confirmation_message(self, command: str) -> str:
         """Generate a context-aware confirmation message using the AI agent."""
-        try:
-            # Improved prompt that works better with smaller models
-            prompt = f"""What does this command do?
-Command: {command}
-
-Answer in one sentence starting with "This will":
-
-Examples:
-touch file.txt -> This will create an empty file named 'file.txt'.
-rm file.txt -> This will delete the file 'file.txt'.
-mkdir folder -> This will create a new directory named 'folder'.
-
-Answer:"""
-            
-            response = self.agent.agent.llama_client.generate(prompt)
-            
-            # Clean up the response
-            explanation = response.strip()
-            
-            # Remove quotes if present
-            if explanation.startswith('"') and explanation.endswith('"'):
-                explanation = explanation[1:-1]
-            
-            # If response is empty or too short, use fallback
-            if not explanation or len(explanation) < 5:
-                explanation = self._get_fallback_explanation(command)
-            
-            return f"{explanation}\nContinue? (y/n): "
-            
-        except Exception as e:
-            # Fallback to simple message if LLM fails
-            self.logger.error(f"Error generating confirmation message: {e}")
-            explanation = self._get_fallback_explanation(command)
-            return f"{explanation}\nContinue? (y/n): "
+        # For smaller models like TinyLlama, use fallback explanations directly
+        # to avoid confusing or incorrect LLM responses
+        explanation = self._get_fallback_explanation(command)
+        return f"{explanation}\nContinue? (y/n): "
     
     def _get_fallback_explanation(self, command: str) -> str:
-        """Provide fallback explanations for common commands when LLM fails."""
-        first_word = command.strip().split()[0].lower()
+        """Provide fallback explanations for common commands."""
+        parts = command.strip().split()
+        if not parts:
+            return f"This will execute: {command}"
+            
+        first_word = parts[0].lower()
         
-        fallback_explanations = {
-            "touch": "This will create an empty file or update its timestamp.",
-            "mkdir": "This will create a new directory.",
-            "rm": "This will delete files or directories.",
-            "cp": "This will copy files or directories.",
-            "mv": "This will move or rename files or directories.",
-            "ls": "This will list files and directories.",
-            "cat": "This will display the contents of a file.",
-            "echo": "This will output text to the terminal.",
-            "cd": "This will change the current directory.",
-            "pwd": "This will show the current directory path."
-        }
+        # Extract filename/path from command for more specific messages
+        if len(parts) > 1:
+            target = parts[1]
+        else:
+            target = None
         
-        return fallback_explanations.get(first_word, f"This will execute: {command}")
+        if first_word == "touch" and target:
+            return f"This will create an empty file named '{target}'."
+        elif first_word == "mkdir" and target:
+            return f"This will create a new directory named '{target}'."
+        elif first_word == "rm" and target:
+            if "-rf" in command or "-r" in command:
+                return f"This will permanently delete '{target}' and all its contents."
+            else:
+                return f"This will delete the file '{target}'."
+        elif first_word == "cp" and len(parts) >= 3:
+            return f"This will copy '{parts[1]}' to '{parts[2]}'."
+        elif first_word == "mv" and len(parts) >= 3:
+            return f"This will move '{parts[1]}' to '{parts[2]}'."
+        elif first_word == "cat" and target:
+            return f"This will display the contents of '{target}'."
+        elif first_word == "echo":
+            return "This will output text to the terminal."
+        elif first_word == "cd" and target:
+            return f"This will change to the directory '{target}'."
+        elif first_word == "ls":
+            return "This will list files and directories."
+        elif first_word == "pwd":
+            return "This will show the current directory path."
+        else:
+            # Generic fallbacks for common commands
+            fallback_explanations = {
+                "touch": "This will create an empty file or update its timestamp.",
+                "mkdir": "This will create a new directory.",
+                "rm": "This will delete files or directories.",
+                "cp": "This will copy files or directories.",
+                "mv": "This will move or rename files or directories.",
+                "ls": "This will list files and directories.",
+                "cat": "This will display the contents of a file.",
+                "echo": "This will output text to the terminal.",
+                "cd": "This will change the current directory.",
+                "pwd": "This will show the current directory path."
+            }
+            
+            return fallback_explanations.get(first_word, f"This will execute: {command}")
     
     def process_natural_language(self, command: str) -> int:
         """Process natural language command through AI agent."""

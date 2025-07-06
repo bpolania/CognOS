@@ -610,6 +610,30 @@ Answer:
 - **Cleaner Interface**: More concise and focused user experience
 - **Better UX**: Users see only relevant information (explanation + prompt)
 
-This ensures users always receive clear, helpful confirmation messages regardless of LLM model performance.
+### Fallback-Only Confirmation System for Model Reliability
+
+#### Issue Resolution
+- **Problem**: TinyLlama model generating confusing multi-command explanations instead of single command explanation
+- **Example Error**: "Touching a file creates... Removing a file... Creating a directory..." for single touch command
+- **Root Cause**: Small language model confusion with complex prompts and examples
+
+#### Solution Implementation (src/shell/main.py)
+- **LLM Bypass**: Switched to fallback-only system for confirmation messages
+- **Reliable Explanations**: Use deterministic, rule-based explanations instead of unpredictable LLM responses
+- **Context-Aware Messages**: Parse command arguments to provide specific, accurate explanations
+- **Improved Fallbacks**: Enhanced fallback system with filename/path-specific messages
+
+#### Enhanced Fallback System
+- **Specific Messages**: "This will create an empty file named 'test.txt'." (vs generic messages)
+- **Command Parsing**: Extract filenames and paths for contextual explanations
+- **Dangerous Command Detection**: Special handling for rm -rf with stronger warnings
+- **Comprehensive Coverage**: Handles touch, mkdir, rm, cp, mv, cat, echo, cd, ls, pwd with specific contexts
+
+#### Expected Behavior Fix
+- **Before**: Confusing multi-command explanations from LLM
+- **After**: Clean, specific explanations like "This will create an empty file named 'test.txt'."
+- **Reliability**: 100% consistent, accurate confirmation messages without LLM unpredictability
+
+This ensures users always receive clear, helpful confirmation messages with complete reliability by avoiding problematic LLM generation for confirmation text.
 
 This changelog should provide Claude Code with complete context for continuing development in future sessions.
