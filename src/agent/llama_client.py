@@ -29,8 +29,15 @@ class LlamaClient:
         self._load_model()
     
     def _load_model(self):
-        """Load the Mistral model via llama.cpp."""
+        """Load the LLM model via llama.cpp."""
         model_path = self.config.get("agent.model_path", "./models/mistral-7b-q4.gguf")
+        
+        # Try relative path from current directory
+        if not os.path.exists(model_path):
+            # Try absolute path from script location
+            script_dir = os.path.dirname(os.path.abspath(__file__))
+            model_path = os.path.join(script_dir, "..", "..", "models", "mistral-7b-q4.gguf")
+            model_path = os.path.normpath(model_path)
         
         if not os.path.exists(model_path):
             raise FileNotFoundError(f"Model not found at {model_path}")
