@@ -1,6 +1,6 @@
 # CognOS Makefile
 
-.PHONY: help setup build install test clean
+.PHONY: help setup build install test clean models
 
 # Default target
 help:
