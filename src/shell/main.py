@@ -47,6 +47,27 @@ class CognosShell:
         """Handle termination signal."""
         self.running = False
     
+    def is_safe_command(self, command: str) -> bool:
+        """Check if a command is safe to execute without confirmation."""
+        safe_commands = [
+            "ls", "ll", "la", "pwd", "whoami", "date", "uptime",
+            "df", "free", "cat", "head", "tail", "less", "more",
+            "grep", "find", "which", "echo", "printenv", "history"
+        ]
+        
+        # Get the first word (the actual command)
+        first_word = command.strip().split()[0].lower()
+        
+        # Check if it's a safe read-only command
+        if first_word in safe_commands:
+            return True
+        
+        # Special cases for ls variants
+        if first_word.startswith("ls"):
+            return True
+            
+        return False
+    
     def is_natural_language(self, command: str) -> bool:
         """Determine if command is natural language or direct shell command."""
         # Simple heuristics - can be enhanced with ML
@@ -83,6 +104,26 @@ class CognosShell:
             self.logger.error(f"Error executing command: {e}")
             return 1
     
+    def get_confirmation_message(self, command: str) -> str:
+        """Generate a context-aware confirmation message using the AI agent."""
+        try:
+            # Ask the LLM to generate an appropriate confirmation message
+            prompt = f"Generate a brief, clear confirmation message for this shell command: '{command}'\n\nConsider:\n- Is it dangerous/destructive?\n- What will it actually do?\n- Should the user be warned?\n\nRespond with ONLY the confirmation message, ending with '(y/n): '"
+            
+            response = self.agent.agent.llama_client.generate(prompt)
+            
+            # Clean up the response and ensure it ends properly
+            confirmation = response.strip()
+            if not confirmation.endswith("(y/n): "):
+                confirmation += "\n(y/n): "
+            
+            return f"Command: {command}\n{confirmation}"
+            
+        except Exception as e:
+            # Fallback to simple message if LLM fails
+            self.logger.error(f"Error generating confirmation message: {e}")
+            return f"Execute this command?\nCommand: {command}\nContinue? (y/n): "
+    
     def process_natural_language(self, command: str) -> int:
         """Process natural language command through AI agent."""
         try:
@@ -91,12 +132,21 @@ class CognosShell:
             if response.get("action") == "execute":
                 shell_command = response.get("command")
                 if shell_command:
-                    print(f"Executing: {shell_command}")
-                    if input("Continue? (y/n): ").lower() == 'y':
+                    # Check if it's a safe command that doesn't need confirmation
+                    if self.is_safe_command(shell_command):
+                        print(f"→ {shell_command}")
                         return self.execute_shell_command(shell_command)
                     else:
-                        print("Command cancelled.")
-                        return 0
+                        # Use context-aware confirmation message
+                        confirmation_msg = self.get_confirmation_message(shell_command)
+                        user_input = input(confirmation_msg).lower()
+                        
+                        # Handle different confirmation responses
+                        if user_input in ['y', 'yes']:
+                            return self.execute_shell_command(shell_command)
+                        else:
+                            print("Command cancelled.")
+                            return 0
             else:
                 print(response.get("message", "Command processed."))
                 return 0
