@@ -152,4 +152,92 @@ make test           # Run tests
 - Do not use `🤖 Generated with [Claude Code](https://claude.ai/code)` or similar AI-generated signatures in any commits, PRs, or documentation. Keep all development artifacts clean and professional.
 - Every time code changes are made (excluding documentation-only changes), add the changes to this changelog with details about what was modified and why.
 
+## Session 2 - Architecture Documentation Expansion (2025-07-06)
+
+### Summary
+Expanded CognOS documentation to cover two distinct deployment models: prototype Raspberry Pi OS image and full Linux distribution. This session clarified the evolution from "layer on existing OS" to comprehensive deployment strategies.
+
+### Key Architectural Decisions
+
+1. **Dual Deployment Strategy**
+   - **Prototype Model**: Pre-configured Raspberry Pi OS image for demos and testing
+   - **Distribution Model**: Complete custom Linux OS for production deployment
+   - Both models maintain core CognOS Agent architecture but target different use cases
+
+2. **Documentation Structure**
+   - Created comprehensive documentation for both deployment models
+   - Maintained alignment with existing codebase architecture
+   - Clear separation of concerns between prototype and production approaches
+
+### Files Created
+
+#### COGNOS_PROTOTYPE.md
+- Complete documentation for Raspberry Pi OS image approach
+- Based on existing README.md and development-setup.md content
+- Emphasizes demo/testing focus with pre-installed CognOS layer
+- Covers installation, configuration, and development workflow
+- Scope: CognOS as pre-installed layer on Raspberry Pi OS
+
+#### COGNOS_DISTRIBUTION.md  
+- Comprehensive documentation for full Linux distribution
+- Enterprise-grade features and production deployment focus
+- Cloud integration, container orchestration, and enterprise security
+- Multi-platform support (x86_64, ARM64, RISC-V)
+- Scope: CognOS as complete operating system replacement
+
+### Architecture Alignment
+
+Both documentation files maintain consistency with existing codebase:
+- **Core Components**: Shell replacement, AI agent, tool system, safety layer
+- **AI Engine**: Mistral 7B Q4/Q5 with llama.cpp integration  
+- **Development Phases**: Aligned with Phase 1-3 roadmap from README.md
+- **Tool Ecosystem**: search_folder, list_options, run_command, create_env, switch_env
+- **Configuration**: JSON-based config system in ~/.config/cognos/
+
+### Development Context Preservation
+
+Documentation maintains full context for development continuation:
+- Raspberry Pi 5 as primary development target
+- VS Code Remote SSH development workflow
+- Mac + Pi development environment setup
+- Git workflow and repository structure
+- Custom shell replacement implementation approach
+
+### Documentation Refactoring
+
+#### README.md Restructure
+- **Removed Redundancy**: Eliminated detailed implementation details covered in other .md files
+- **Focus Shift**: Changed from "General Development Plan" to project overview and repository guide
+- **Clear Navigation**: Added links to specialized documentation (PROTOTYPE.md, DISTRIBUTION.md, development-setup.md)
+- **Repository-Centric**: Emphasized codebase structure, quick start, and contribution workflow
+- **Concise Architecture**: High-level architecture overview with links to detailed specs
+
+#### Content Reorganization
+- **Project Overview**: Clear deployment model distinction with direct links
+- **Repository Structure**: Visual directory tree for code navigation
+- **Core Architecture**: Concise technical overview without implementation details
+- **Quick Start**: Practical commands for immediate project engagement
+- **Development Links**: Centralized navigation to all development documentation
+
+This refactoring eliminates redundancy between README.md and the specialized deployment documentation while maintaining clear project navigation and onboarding flow.
+
+## Session 3 - Phase 1 Development Start (2025-07-06)
+
+### Development Environment Issues and Fixes
+
+#### Requirements.txt Optimization for Pi Development
+- **Issue**: PyQt5 compilation failed on Raspberry Pi during initial setup
+- **Solution**: Streamlined requirements.txt for Phase 1 development focus
+- **Changes**:
+  - Removed PyQt5 and heavy UI dependencies (moved to Phase 3)
+  - Removed transformers and torch (not needed for initial llama.cpp integration)
+  - Removed numpy (llama-cpp-python handles its own dependencies)
+  - Kept core dependencies: llama-cpp-python, requests, pyyaml, pytest, psutil
+- **Rationale**: Focus on core AI functionality first, add UI/ML dependencies in later phases
+
+#### Development Strategy
+- **Phase 1 Focus**: Get llama.cpp + basic agent working without UI complexity
+- **Incremental Approach**: Add dependencies as needed for each phase
+- **Pi Optimization**: Lighter initial setup reduces compilation time and potential errors
+
 This changelog should provide Claude Code with complete context for continuing development in future sessions.
