@@ -376,4 +376,32 @@ self.model = Llama(
 
 This optimization enables Phase 1 AI engine functionality on Raspberry Pi hardware while maintaining reasonable model performance for command processing tasks.
 
+### Model Switch to TinyLlama for Pi Compatibility
+
+#### Memory Constraints Resolution
+- **Issue**: Even with optimizations, 3.6GB LLaMA 2 model still triggered OOM killer on Pi
+- **Solution**: Switched default model to TinyLlama 1.1B Chat (1.1GB vs 3.6GB)
+- **Impact**: 70% reduction in model size for reliable Pi operation
+
+#### TinyLlama Model Specifications
+- **Model**: TinyLlama 1.1B Chat v1.0 Q4_K_M quantized
+- **Source**: TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF
+- **Size**: ~1.1GB (vs 3.6GB LLaMA 2)
+- **Performance**: Optimized for resource-constrained environments
+- **Capability**: Sufficient for basic command processing and tool calling
+
+#### Download Script Updates (scripts/download-models.sh)
+- **New URL**: TinyLlama GGUF model from TheBloke collection
+- **Download Time**: Reduced from 10-15 minutes to 3-5 minutes
+- **Messaging**: Updated to reflect Pi optimization focus
+- **File Size**: Clear expectation of 1.1GB download
+
+#### Trade-offs and Benefits
+- **Memory**: Fits comfortably in Pi RAM with system overhead
+- **Performance**: Faster loading and inference on Pi hardware
+- **Capability**: Reduced compared to larger models but adequate for Phase 1 testing
+- **Reliability**: Stable operation without OOM killer intervention
+
+This model change enables reliable Phase 1 AI engine testing and development on Raspberry Pi 5 hardware while maintaining core functionality for command processing and tool integration validation.
+
 This changelog should provide Claude Code with complete context for continuing development in future sessions.
