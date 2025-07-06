@@ -519,4 +519,31 @@ Respond with only one sentence explaining what the command does."""
 
 This fix addresses the final Phase 1 shell safety system requirement, providing intelligent confirmation messages that properly inform users about command effects without formatting artifacts or incomplete responses.
 
+### Agent Command Classification Fix
+
+#### Issue Identified
+- **Problem**: "create a file called text.txt" incorrectly mapped to Python virtual environment creation
+- **Root Cause**: Ambiguous system prompt caused LLM to confuse file creation with environment creation
+- **Symptom**: Agent generated `python3 -m venv` commands instead of `touch` commands for file creation
+
+#### System Prompt Improvements (src/agent/main.py)
+- **Specific Mappings**: Added explicit file operation mappings to prevent confusion
+- **Clear Separation**: Distinguished between file creation and virtual environment creation
+- **Enhanced Examples**: Added concrete examples for common file operations
+- **Disambiguation**: Added "IMPORTANT FILE OPERATIONS" section with clear guidelines
+
+#### New Command Mappings
+```
+- "create file" / "make file" / "touch file" → use run_command with "touch filename"
+- "create directory" / "make directory" → use run_command with "mkdir dirname"  
+- "create virtual environment" / "create python environment" → use create_env
+```
+
+#### Expected Behavior Fix
+- **Before**: "create a file called text.txt" → `python3 -m venv` command
+- **After**: "create a file called text.txt" → `touch text.txt` command
+- **Clarity**: Explicit distinction between file operations and environment management
+
+This resolves the command classification issue and ensures natural language commands are properly mapped to their intended shell operations.
+
 This changelog should provide Claude Code with complete context for continuing development in future sessions.

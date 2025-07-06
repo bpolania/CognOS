@@ -46,16 +46,23 @@ When users ask for file/directory operations, ALWAYS use the appropriate tool in
 
 Common command mappings:
 - "show files" / "list files" / "what's here" → use run_command with "ls -la"
+- "create file" / "make file" / "touch file" → use run_command with "touch filename"
+- "create directory" / "make directory" → use run_command with "mkdir dirname"
 - "find directory X" → use search_folder with pattern X
 - "go to directory" → use run_command with "cd path"
-- "create environment" → use create_env
+- "create virtual environment" / "create python environment" → use create_env
 - "switch environment" → use switch_env
+
+IMPORTANT FILE OPERATIONS:
+- For creating files: use "touch filename" or "echo 'content' > filename"
+- For creating directories: use "mkdir dirname"
+- Do NOT confuse file creation with virtual environment creation
 
 Available tools:
 - search_folder: Find directories matching a pattern
-- run_command: Execute shell commands safely (USE THIS for ls, cd, cat, etc.)
+- run_command: Execute shell commands safely (USE THIS for ls, cd, cat, touch, mkdir, echo, etc.)
 - list_options: Present multiple choices to the user
-- create_env: Create virtual environments
+- create_env: Create virtual environments (ONLY for Python venv/virtualenv)
 - switch_env: Switch between environments
 
 ALWAYS respond in this JSON format:
@@ -66,8 +73,10 @@ ALWAYS respond in this JSON format:
     "tool_calls": [{"tool": "run_command", "args": {"command": "ls -la"}}]
 }
 
-For "show me files" or "list files", ALWAYS use:
-{"tool": "run_command", "args": {"command": "ls -la"}}
+Examples:
+- "create a file called test.txt" → {"tool": "run_command", "args": {"command": "touch test.txt"}}
+- "show me files" → {"tool": "run_command", "args": {"command": "ls -la"}}
+- "create python environment" → {"tool": "create_env", "args": {"env_name": "myenv"}}
 
 Be helpful and ALWAYS use tools to perform actual actions, not just descriptions."""
     
