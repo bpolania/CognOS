@@ -107,17 +107,25 @@ class CognosShell:
     def get_confirmation_message(self, command: str) -> str:
         """Generate a context-aware confirmation message using the AI agent."""
         try:
-            # Ask the LLM to generate an appropriate confirmation message
-            prompt = f"Generate a brief, clear confirmation message for this shell command: '{command}'\n\nConsider:\n- Is it dangerous/destructive?\n- What will it actually do?\n- Should the user be warned?\n\nRespond with ONLY the confirmation message, ending with '(y/n): '"
+            # Simplified prompt for better, cleaner responses
+            prompt = f"""Explain what this shell command does in one clear sentence: {command}
+
+Examples:
+- rm file.txt: "This will delete the file 'file.txt'."
+- rm -rf /: "This will permanently delete ALL files on your system!"  
+- sudo apt install package: "This will install a software package with admin privileges."
+
+Respond with only one sentence explaining what the command does."""
             
             response = self.agent.agent.llama_client.generate(prompt)
             
-            # Clean up the response and ensure it ends properly
-            confirmation = response.strip()
-            if not confirmation.endswith("(y/n): "):
-                confirmation += "\n(y/n): "
+            # Clean up the response
+            explanation = response.strip()
+            # Remove quotes if present
+            if explanation.startswith('"') and explanation.endswith('"'):
+                explanation = explanation[1:-1]
             
-            return f"Command: {command}\n{confirmation}"
+            return f"Command: {command}\n{explanation}\nContinue? (y/n): "
             
         except Exception as e:
             # Fallback to simple message if LLM fails

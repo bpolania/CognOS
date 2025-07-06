@@ -482,4 +482,41 @@ def get_confirmation_message(self, command: str) -> str:
 
 This creates a truly intelligent shell safety system that balances user experience with security through AI-powered command analysis rather than rigid rule-based approaches.
 
+### LLM Confirmation Message Quality Improvements
+
+#### Issue Resolution
+- **Problem**: LLM-generated confirmation messages were malformed and unhelpful
+- **User Feedback**: "they worked but the message is wrong" 
+- **Example Malformed Output**: 
+  ```
+  Command: rm test.txt
+  or '(y/N): ', depending on the answer.
+  (y/n): y
+  ```
+
+#### Implementation Fix (src/shell/main.py)
+- **Simplified Prompt Structure**: Redesigned LLM prompt for cleaner, more focused responses
+- **Enhanced Examples**: Added specific command examples to guide LLM output format
+- **Response Cleaning**: Improved post-processing to remove quotes and formatting artifacts
+
+#### New Prompt Design
+```python
+prompt = f"""Explain what this shell command does in one clear sentence: {command}
+
+Examples:
+- rm file.txt: "This will delete the file 'file.txt'."
+- rm -rf /: "This will permanently delete ALL files on your system!"  
+- sudo apt install package: "This will install a software package with admin privileges."
+
+Respond with only one sentence explaining what the command does."""
+```
+
+#### Expected Behavior Improvement
+- **Before**: Malformed messages with incomplete text and formatting issues
+- **After**: Clear, single-sentence explanations of command effects
+- **Format**: "Command: {command}\n{explanation}\nContinue? (y/n): "
+- **User Experience**: Helpful, contextual warnings that explain command consequences
+
+This fix addresses the final Phase 1 shell safety system requirement, providing intelligent confirmation messages that properly inform users about command effects without formatting artifacts or incomplete responses.
+
 This changelog should provide Claude Code with complete context for continuing development in future sessions.
