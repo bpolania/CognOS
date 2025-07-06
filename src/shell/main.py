@@ -133,13 +133,13 @@ Answer:"""
             if not explanation or len(explanation) < 5:
                 explanation = self._get_fallback_explanation(command)
             
-            return f"Command: {command}\n{explanation}\nContinue? (y/n): "
+            return f"{explanation}\nContinue? (y/n): "
             
         except Exception as e:
             # Fallback to simple message if LLM fails
             self.logger.error(f"Error generating confirmation message: {e}")
             explanation = self._get_fallback_explanation(command)
-            return f"Command: {command}\n{explanation}\nContinue? (y/n): "
+            return f"{explanation}\nContinue? (y/n): "
     
     def _get_fallback_explanation(self, command: str) -> str:
         """Provide fallback explanations for common commands when LLM fails."""

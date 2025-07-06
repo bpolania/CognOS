@@ -585,6 +585,31 @@ Answer:
 - **After**: "Command: touch test.txt\nThis will create an empty file named 'test.txt'.\nContinue? (y/n): "
 - **Robustness**: Works reliably even when TinyLlama model struggles with prompt
 
+### Confirmation Message Format Simplification
+
+#### User Feedback Integration
+- **Issue**: "Command: rm -rf test.txt" line was redundant in confirmation messages
+- **User Request**: Remove unnecessary command display since user already knows what they asked for
+- **Goal**: Cleaner, more concise confirmation experience
+
+#### Format Change (src/shell/main.py)
+- **Before**: 
+  ```
+  Command: rm -rf test.txt
+  This will delete the file 'test.txt' from your system.
+  Continue? (y/n):
+  ```
+- **After**:
+  ```
+  This will delete the file 'test.txt' from your system.
+  Continue? (y/n):
+  ```
+
+#### Benefits
+- **Reduced Redundancy**: Eliminates duplicate command information
+- **Cleaner Interface**: More concise and focused user experience
+- **Better UX**: Users see only relevant information (explanation + prompt)
+
 This ensures users always receive clear, helpful confirmation messages regardless of LLM model performance.
 
 This changelog should provide Claude Code with complete context for continuing development in future sessions.
