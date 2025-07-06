@@ -45,8 +45,10 @@ class LlamaClient:
         try:
             self.model = Llama(
                 model_path=model_path,
-                n_ctx=self.config.get("agent.context_length", 4096),
-                n_threads=4,  # Optimize for Pi
+                n_ctx=self.config.get("agent.context_length", 2048),  # Reduced context
+                n_threads=2,  # Fewer threads for Pi
+                n_batch=128,  # Smaller batch size
+                low_vram=True,  # Low VRAM mode
                 verbose=False
             )
             self.logger.info(f"Model loaded successfully: {model_path}")

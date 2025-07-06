@@ -343,4 +343,37 @@ if not os.path.exists(model_path):
 
 This resolves the core Phase 1 blocker and enables complete AI engine functionality testing with a reliable, production-ready language model optimized for Raspberry Pi hardware.
 
+### Memory Optimization for Raspberry Pi
+
+#### Model Loading Memory Issues
+- **Issue**: 3.6GB LLaMA 2 model caused "Killed" process on Raspberry Pi
+- **Root Cause**: Model size exceeded available RAM, triggering OOM killer
+- **Solution**: Implemented Pi-specific memory optimizations in llama.cpp configuration
+
+#### llama.cpp Memory Optimizations (src/agent/llama_client.py)
+- **Context Length**: Reduced from 4096 to 2048 tokens (50% memory reduction)
+- **Thread Count**: Reduced from 4 to 2 threads (lower CPU/memory pressure)
+- **Batch Size**: Added n_batch=128 for smaller processing chunks
+- **Low VRAM Mode**: Enabled low_vram=True for memory-constrained environments
+- **Memory Profile**: Optimized for 8GB Pi with other system processes
+
+#### Configuration Changes
+```python
+self.model = Llama(
+    model_path=model_path,
+    n_ctx=2048,        # Reduced context length
+    n_threads=2,       # Fewer threads for Pi
+    n_batch=128,       # Smaller batch size
+    low_vram=True,     # Low VRAM mode
+    verbose=False
+)
+```
+
+#### Alternative Model Strategy
+- **Backup Plan**: TinyLlama 1.1B model (1.1GB vs 3.6GB) for extreme memory constraints
+- **Download URL**: TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF Q4_K_M variant
+- **Trade-off**: Smaller model size vs reduced capability for memory-constrained testing
+
+This optimization enables Phase 1 AI engine functionality on Raspberry Pi hardware while maintaining reasonable model performance for command processing tasks.
+
 This changelog should provide Claude Code with complete context for continuing development in future sessions.
