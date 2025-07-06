@@ -3,9 +3,17 @@ Agent client for shell integration.
 """
 
 import json
+import os
+import sys
 from typing import Dict, Any
 
-from .main import CognosAgent
+# Handle both relative and absolute imports
+try:
+    from .main import CognosAgent
+except ImportError:
+    # Add parent directory to path for direct execution
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
+    from src.agent.main import CognosAgent
 
 
 class AgentClient:

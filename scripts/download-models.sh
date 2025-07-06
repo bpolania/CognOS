@@ -1,13 +1,14 @@
 #!/bin/bash
-"""
-Download required models for CognOS.
-"""
+# Download required models for CognOS
 
 set -e
 
 MODELS_DIR="./models"
-MISTRAL_URL="https://huggingface.co/TheBloke/Mistral-7B-Instruct-v0.2-GGUF/resolve/main/mistral-7b-instruct-v0.2.q4_0.gguf"
+MISTRAL_URL="https://huggingface.co/microsoft/DialoGPT-medium/resolve/main/pytorch_model.bin"
 MISTRAL_FILE="mistral-7b-q4.gguf"
+
+# Alternative: Use a working GGUF model URL
+MISTRAL_URL="https://huggingface.co/bartowski/Mistral-7B-Instruct-v0.3-GGUF/resolve/main/Mistral-7B-Instruct-v0.3-Q4_K_M.gguf"
 
 echo "Setting up models directory..."
 mkdir -p "$MODELS_DIR"

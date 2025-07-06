@@ -13,9 +13,17 @@ import subprocess
 import signal
 from typing import Optional
 
-from ..agent.client import AgentClient
-from ..common.config import Config
-from ..common.logger import Logger
+# Handle both relative and absolute imports
+try:
+    from ..agent.client import AgentClient
+    from ..common.config import Config
+    from ..common.logger import Logger
+except ImportError:
+    # Add parent directory to path for direct execution
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
+    from src.agent.client import AgentClient
+    from src.common.config import Config
+    from src.common.logger import Logger
 
 
 class CognosShell:
