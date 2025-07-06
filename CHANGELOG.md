@@ -634,6 +634,29 @@ Answer:
 - **After**: Clean, specific explanations like "This will create an empty file named 'test.txt'."
 - **Reliability**: 100% consistent, accurate confirmation messages without LLM unpredictability
 
+### Command Flag Parsing Fix for Confirmation Messages
+
+#### Issue Identified
+- **Problem**: Confirmation messages incorrectly parsed command flags as filenames
+- **Example**: "This will delete the file '-f'." for `rm -f test.txt` command
+- **Root Cause**: Simple parsing logic treated first argument as filename without considering flags
+
+#### Solution Implementation (src/shell/main.py)
+- **Flag-Aware Parsing**: Added `get_target_file()` function to skip flags and find actual filenames
+- **Proper Argument Extraction**: Scan command arguments to find non-flag parameters
+- **Multi-Argument Support**: Handle commands with multiple files (cp, mv) by finding source and destination
+- **Fallback Safety**: Graceful degradation to generic messages when parsing fails
+
+#### Enhanced Parsing Logic
+- **Skip Flags**: Ignore arguments starting with `-` when extracting filenames
+- **Source/Destination**: For cp/mv commands, find both source and destination files
+- **Robust Extraction**: Handle complex commands with multiple flags and arguments
+
+#### Expected Behavior Fix
+- **Before**: "This will delete the file '-f'." for `rm -f test.txt`
+- **After**: "This will delete the file 'test.txt'." for `rm -f test.txt`
+- **Accuracy**: Correctly identifies actual files being operated on, not command flags
+
 This ensures users always receive clear, helpful confirmation messages with complete reliability by avoiding problematic LLM generation for confirmation text.
 
 This changelog should provide Claude Code with complete context for continuing development in future sessions.

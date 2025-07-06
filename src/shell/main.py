@@ -119,31 +119,75 @@ class CognosShell:
             
         first_word = parts[0].lower()
         
-        # Extract filename/path from command for more specific messages
-        if len(parts) > 1:
-            target = parts[1]
-        else:
-            target = None
+        # Extract actual filename/path from command, skipping flags
+        def get_target_file(parts, start_idx=1):
+            """Extract the actual filename from command parts, skipping flags."""
+            for i in range(start_idx, len(parts)):
+                if not parts[i].startswith('-'):
+                    return parts[i]
+            return None
         
-        if first_word == "touch" and target:
-            return f"This will create an empty file named '{target}'."
-        elif first_word == "mkdir" and target:
-            return f"This will create a new directory named '{target}'."
-        elif first_word == "rm" and target:
-            if "-rf" in command or "-r" in command:
-                return f"This will permanently delete '{target}' and all its contents."
+        if first_word == "touch":
+            target = get_target_file(parts)
+            if target:
+                return f"This will create an empty file named '{target}'."
             else:
-                return f"This will delete the file '{target}'."
-        elif first_word == "cp" and len(parts) >= 3:
-            return f"This will copy '{parts[1]}' to '{parts[2]}'."
-        elif first_word == "mv" and len(parts) >= 3:
-            return f"This will move '{parts[1]}' to '{parts[2]}'."
-        elif first_word == "cat" and target:
-            return f"This will display the contents of '{target}'."
+                return "This will create an empty file or update its timestamp."
+        elif first_word == "mkdir":
+            target = get_target_file(parts)
+            if target:
+                return f"This will create a new directory named '{target}'."
+            else:
+                return "This will create a new directory."
+        elif first_word == "rm":
+            target = get_target_file(parts)
+            if target:
+                if "-rf" in command or "-r" in command:
+                    return f"This will permanently delete '{target}' and all its contents."
+                else:
+                    return f"This will delete the file '{target}'."
+            else:
+                return "This will delete files or directories."
+        elif first_word == "cp":
+            # For cp, we need source and destination
+            source = get_target_file(parts)
+            if source and len(parts) >= 3:
+                # Find destination (last non-flag argument)
+                dest = None
+                for i in range(len(parts) - 1, 0, -1):
+                    if not parts[i].startswith('-'):
+                        dest = parts[i]
+                        break
+                if dest and dest != source:
+                    return f"This will copy '{source}' to '{dest}'."
+            return "This will copy files or directories."
+        elif first_word == "mv":
+            # For mv, we need source and destination
+            source = get_target_file(parts)
+            if source and len(parts) >= 3:
+                # Find destination (last non-flag argument)
+                dest = None
+                for i in range(len(parts) - 1, 0, -1):
+                    if not parts[i].startswith('-'):
+                        dest = parts[i]
+                        break
+                if dest and dest != source:
+                    return f"This will move '{source}' to '{dest}'."
+            return "This will move or rename files or directories."
+        elif first_word == "cat":
+            target = get_target_file(parts)
+            if target:
+                return f"This will display the contents of '{target}'."
+            else:
+                return "This will display the contents of a file."
         elif first_word == "echo":
             return "This will output text to the terminal."
-        elif first_word == "cd" and target:
-            return f"This will change to the directory '{target}'."
+        elif first_word == "cd":
+            target = get_target_file(parts)
+            if target:
+                return f"This will change to the directory '{target}'."
+            else:
+                return "This will change the current directory."
         elif first_word == "ls":
             return "This will list files and directories."
         elif first_word == "pwd":
