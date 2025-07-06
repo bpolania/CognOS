@@ -107,30 +107,58 @@ class CognosShell:
     def get_confirmation_message(self, command: str) -> str:
         """Generate a context-aware confirmation message using the AI agent."""
         try:
-            # Simplified prompt for better, cleaner responses
-            prompt = f"""Explain what this shell command does in one clear sentence: {command}
+            # Improved prompt that works better with smaller models
+            prompt = f"""What does this command do?
+Command: {command}
+
+Answer in one sentence starting with "This will":
 
 Examples:
-- rm file.txt: "This will delete the file 'file.txt'."
-- rm -rf /: "This will permanently delete ALL files on your system!"  
-- sudo apt install package: "This will install a software package with admin privileges."
+touch file.txt -> This will create an empty file named 'file.txt'.
+rm file.txt -> This will delete the file 'file.txt'.
+mkdir folder -> This will create a new directory named 'folder'.
 
-Respond with only one sentence explaining what the command does."""
+Answer:"""
             
             response = self.agent.agent.llama_client.generate(prompt)
             
             # Clean up the response
             explanation = response.strip()
+            
             # Remove quotes if present
             if explanation.startswith('"') and explanation.endswith('"'):
                 explanation = explanation[1:-1]
+            
+            # If response is empty or too short, use fallback
+            if not explanation or len(explanation) < 5:
+                explanation = self._get_fallback_explanation(command)
             
             return f"Command: {command}\n{explanation}\nContinue? (y/n): "
             
         except Exception as e:
             # Fallback to simple message if LLM fails
             self.logger.error(f"Error generating confirmation message: {e}")
-            return f"Execute this command?\nCommand: {command}\nContinue? (y/n): "
+            explanation = self._get_fallback_explanation(command)
+            return f"Command: {command}\n{explanation}\nContinue? (y/n): "
+    
+    def _get_fallback_explanation(self, command: str) -> str:
+        """Provide fallback explanations for common commands when LLM fails."""
+        first_word = command.strip().split()[0].lower()
+        
+        fallback_explanations = {
+            "touch": "This will create an empty file or update its timestamp.",
+            "mkdir": "This will create a new directory.",
+            "rm": "This will delete files or directories.",
+            "cp": "This will copy files or directories.",
+            "mv": "This will move or rename files or directories.",
+            "ls": "This will list files and directories.",
+            "cat": "This will display the contents of a file.",
+            "echo": "This will output text to the terminal.",
+            "cd": "This will change the current directory.",
+            "pwd": "This will show the current directory path."
+        }
+        
+        return fallback_explanations.get(first_word, f"This will execute: {command}")
     
     def process_natural_language(self, command: str) -> int:
         """Process natural language command through AI agent."""

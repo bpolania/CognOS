@@ -546,4 +546,45 @@ This fix addresses the final Phase 1 shell safety system requirement, providing 
 
 This resolves the command classification issue and ensures natural language commands are properly mapped to their intended shell operations.
 
+### Confirmation Message Generation Robustness
+
+#### Issue Identified
+- **Problem**: Confirmation messages showed only "Command: touch test.txt" without explanation
+- **Root Cause**: TinyLlama model not reliably generating responses to complex prompts
+- **Impact**: Users saw incomplete confirmation messages missing the explanation text
+
+#### Implementation Improvements (src/shell/main.py)
+- **Simplified Prompt**: Redesigned prompt format optimized for smaller language models
+- **Fallback System**: Added comprehensive fallback explanations for common commands
+- **Response Validation**: Check for empty/short responses and use fallbacks automatically
+- **Better Examples**: Clearer format with direct command->explanation mapping
+
+#### New Prompt Format
+```
+What does this command do?
+Command: {command}
+
+Answer in one sentence starting with "This will":
+
+Examples:
+touch file.txt -> This will create an empty file named 'file.txt'.
+rm file.txt -> This will delete the file 'file.txt'.
+mkdir folder -> This will create a new directory named 'folder'.
+
+Answer:
+```
+
+#### Fallback Explanation System
+- **Automatic Fallback**: When LLM fails or returns empty response, use predefined explanations
+- **Common Commands**: Built-in explanations for touch, mkdir, rm, cp, mv, ls, cat, echo, cd, pwd
+- **Generic Fallback**: "This will execute: {command}" for unknown commands
+- **Reliability**: Ensures users always get helpful confirmation messages
+
+#### Expected Behavior Fix
+- **Before**: "Command: touch test.txt" (incomplete)
+- **After**: "Command: touch test.txt\nThis will create an empty file named 'test.txt'.\nContinue? (y/n): "
+- **Robustness**: Works reliably even when TinyLlama model struggles with prompt
+
+This ensures users always receive clear, helpful confirmation messages regardless of LLM model performance.
+
 This changelog should provide Claude Code with complete context for continuing development in future sessions.
